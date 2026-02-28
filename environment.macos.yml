@@ -1,0 +1,16 @@
+name: AnimalGAN
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - numpy
+  - pandas
+  - scikit-learn
+  - scipy
+  - rdkit
+  - pubchempy
+  - tqdm
+  - pip:
+      - torch
+      - mordred
