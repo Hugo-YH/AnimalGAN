@@ -32,18 +32,26 @@ def generate(treatments, descriptors, training_data, descriptors_training, resul
 
     measurements = training_data.iloc[:, 3:]
     scaler.fit(measurements)
-    Results = pd.DataFrame(columns=measurements.columns)
+    Results = []
+    treatment_rows = []
+    max_attempts = 200
     for i in range(S.shape[0]):
         num = 0
+        attempts = 0
         while num < opt.num_generate:
+            attempts += 1
             z = torch.randn(1, opt.Z_dim).to(device)
             generated_records = generator(z, S[i].view(1, -1), T[i].view(1, -1), D[i].view(1, -1))
             generated_records = scaler.inverse_transform(generated_records.cpu().detach().numpy())
             check = np.sum(generated_records[:, 9:14])
-            if 95 < check < 105:
+            if 95 < check < 105 or attempts >= max_attempts:
                 num += 1
-                Results.loc[i] = generated_records.flatten()
-    Results = pd.concat([treatments.loc[treatments.index.repeat(opt.num_generate)].reset_index(drop=True), Results], axis=1)
+                Results.append(generated_records.flatten())
+                treatment_rows.append(treatments.iloc[i])
+                attempts = 0
+    Results = pd.DataFrame(Results, columns=measurements.columns)
+    treatments_out = pd.DataFrame(treatment_rows).reset_index(drop=True)
+    Results = pd.concat([treatments_out, Results], axis=1)
     Results.to_csv(result_path, sep='\t', index=False)
 
 

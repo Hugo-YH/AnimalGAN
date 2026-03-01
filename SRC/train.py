@@ -1,3 +1,4 @@
+import os
 import torch
 from torch import autograd
 
@@ -106,7 +107,7 @@ def train(generator, discriminator, dataloader, n_epochs, n_critic, Z_dim, devic
                 optimizer_G.step()
             print(
                 "[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]"
-                % (epoch + 1, opt.n_epochs, i + 1, len(dataloader), d_loss.item(), g_loss.item())
+                % (epoch + 1, n_epochs, i + 1, len(dataloader), d_loss.item(), g_loss.item())
             )
         if (epoch + 1) % interval == 0:
             if not os.path.exists(model_path):
@@ -115,14 +116,9 @@ def train(generator, discriminator, dataloader, n_epochs, n_critic, Z_dim, devic
 
 
 if __name__ == '__main__':
-    import os
     from utils import create_custom_dataloader
     from opt import parse_opt
     from model import Generator, Discriminator
-    import torch
-
-    wd = r'/path/to/your/project'
-    os.chdir(wd)
     opt = parse_opt()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     data_path = opt.data_path
