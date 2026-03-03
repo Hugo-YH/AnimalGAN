@@ -2,6 +2,8 @@
 
 This repository contains code for the paper **AnimalGAN: A Generative Adversarial Network Model Alternative to Animal Studies for Clinical Pathology Assessment**.
 
+中文文档: [README.zh-CN.md](README.zh-CN.md)
+
 ## Quick Start (Out-of-the-box)
 
 ### 1. Create environment (first time only)
@@ -41,6 +43,20 @@ Compatibility entrypoint is also available:
 bash scripts/run.sh
 ```
 
+## Output File Interpretation
+
+By default, generation writes:
+
+```text
+Results/generated_data_5.tsv
+```
+
+The file contains:
+- first 3 columns: treatment condition (`COMPOUND_NAME`, `SACRI_PERIOD`, `DOSE_LEVEL`)
+- remaining columns: generated hematology/biochemistry measurements
+
+If `--num-generate N` is used, each treatment condition gets `N` generated records.
+
 ## Repository Structure
 
 ```text
@@ -76,6 +92,26 @@ Use `train_cwgangp.py` as the executable training entrypoint:
 ```bash
 conda run -n AnimalGAN python SRC/train_cwgangp.py --n_epochs 1000
 ```
+
+### 1-epoch training smoke test
+
+```bash
+conda run -n AnimalGAN python SRC/train_cwgangp.py --n_epochs 1 --interval 1 --batch_size 64
+```
+
+This is for pipeline validation only (data loading, forward/backward, optimizer step, checkpoint write), not model quality.
+
+## Troubleshooting
+
+- `ModuleNotFoundError: No module named torch`
+  - Install env first: `conda env create -f environment.yml`
+  - Then run with env: `bash script/run.sh --env AnimalGAN`
+
+- `models/AnimalGAN` not found
+  - Ensure pretrained model file exists at `models/AnimalGAN` before running generation.
+
+- Env auto-detect picked wrong env
+  - Force env name: `bash script/run.sh --env YOUR_ENV_NAME`
 
 ## Notes
 
