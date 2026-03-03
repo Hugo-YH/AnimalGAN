@@ -1,43 +1,84 @@
 # AnimalGAN: A Generative Adversarial Network Model Alternative to Animal Studies for Clinical Pathology Assessment
-This repository provides the source codes for our paper **AnimalGAN: A Generative Adversarial Network Model Alternative to Animal Studies for Clinical Pathology Assessment**.
+
+This repository contains code for the paper **AnimalGAN: A Generative Adversarial Network Model Alternative to Animal Studies for Clinical Pathology Assessment**.
+
+## Quick Start (Out-of-the-box)
+
+### 1. Create environment (first time only)
+
+```bash
+conda env create -f environment.yml
+```
+
+### 2. Run one-click demo
+
+From repo root:
+
+```bash
+bash script/run.sh
+```
+
+This command will:
+- auto-detect conda env (`AnimalGAN` or `animalgan`)
+- run `SRC/generate.py` with `--num_generate 5`
+- write output to `Results/generated_data_5.tsv`
+
+## One-click Script Options
+
+```bash
+bash script/run.sh --num-generate 20
+bash script/run.sh --env AnimalGAN
+bash script/run.sh --with-train-smoke
+```
+
+- `--num-generate N`: number of records generated per treatment condition
+- `--env ENV_NAME`: force a specific conda env name
+- `--with-train-smoke`: additionally run a 1-epoch training smoke test (`SRC/train_cwgangp.py`)
+
+Compatibility entrypoint is also available:
+
+```bash
+bash scripts/run.sh
+```
 
 ## Repository Structure
-    ├── Data/                                # Directory for example data
-    │   ├── SDFs/                            # Structure-Data Files (SDFs) of compounds of interest
-    │   ├── Example_Data_training.tsv        # Example of the training dataset
-    │   └── Example_MolecularDescriptors.tsv # Example of the molecular descriptors
-    ├── SRC/                                 # Directory for source code
-    │   ├── model.py                         # Define the Generator class and the Discriminator class
-    │   ├── train_cwgangp.py                 # Script for training the model using Conditional WGAN with gradient penalty (CWGAN_GP)
-    │   ├── train_cwgangp_scale.py           # Script for training the model using CWGAN_GP with different scaling
-    │   ├── train.py                         # Script for training the model
-    │   ├── generate.py                      # Script for generating data using the pretrained model
-    │   └── utils.py                         # Utility functions
-    └── environment.yml                      # Environment configuration file
 
-## Requirements
-The code was tested with the packages listed in `environment.yml`. We assume that the installation of the above-mentioned packages covers all dependencies. In case we have missed essential dependencies please raise an issue. To allow you to reproduce our results easily, we provided an instruction on how to setup the required environment and run the code in the `Demo.md`.
-
-## Usage
-```sh
-bash ./scripts/run.sh 
+```text
+Data/                                # Example data
+  SDFs/                              # SDF files
+  Example_Data_training.tsv          # Example training data
+  Example_MolecularDescriptors.tsv   # Example molecular descriptors
+  Example_Treatments_test.tsv        # Example treatment conditions
+SRC/                                 # Source code
+  model.py                           # Generator and Discriminator
+  opt.py                             # Hyperparameter parser
+  train_cwgangp.py                   # Main training entrypoint
+  train_cwgangp_scale.py             # Variant training script
+  train.py                           # Incomplete/experimental script
+  generate.py                        # Data generation with pretrained model
+  utils.py                           # Utilities
+script/run.sh                        # One-click demo script
+scripts/run.sh                       # Compatibility wrapper
 ```
-Remember to set correct root path, data path, and checkpoint path.
 
-### Hyperparameters
-We have a module `opt.py` used to parse hyperparameters, the default values of the hyperparameters are provided. When running the script, please specify the hyperparameters by using the `--[hyperparaname]` option.
+## Manual Commands
 
-### Training
-All the hyperparameters regarding the training should be specified by using `--[hyperparaname] [value]`, the default values are also provided in the `opt.py`.
-To train your own model, please specify the hyperparameters you want to use.
-```sh
-python train.py --[hyperparaname] [value]
+### Generate data
+
+```bash
+conda run -n AnimalGAN python SRC/generate.py --num_generate 100
 ```
-More detais of usage are provided in the `Demo.md`.
 
-### Generating
-To generate clinical pathology data for treatment conditions you are interested, please specify the number of valid records you want to generate using the `--num_generate` option with an integer.
-```sh
-python generate.py --num_generate 100 --model_path path/to/model --results_path where_to_save
+### Train model
+
+Use `train_cwgangp.py` as the executable training entrypoint:
+
+```bash
+conda run -n AnimalGAN python SRC/train_cwgangp.py --n_epochs 1000
 ```
-More detais of usage are provided in the `Demo.md`.
+
+## Notes
+
+- Pretrained model file is expected at `models/AnimalGAN` (already present in this repo).
+- Generated files are saved under `Results/`.
+- If your conda env name is not `AnimalGAN`/`animalgan`, pass `--env YOUR_ENV_NAME`.
